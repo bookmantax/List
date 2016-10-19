@@ -57,7 +57,7 @@ public class SplashActivity extends AppCompatActivity {
     {
         settings = getSharedPreferences("UserPreferences", 0);
         editor = settings.edit();
-        editor.putString("Business", "");
+        editor.putString("ArrivingLocation", "");
         editor.commit();
 
         gpsManager = new GPSManager(this);
@@ -79,7 +79,7 @@ public class SplashActivity extends AppCompatActivity {
                 {
                     country = addresses.get(0).getCountryName();
                 }
-                editor.putString("Location", city + ", " + country);
+                editor.putString("DepartingLocation", city + ", " + country);
                 editor.putFloat("Latitude", (float)latitude);
                 editor.putFloat("Longitude", (float)longitude);
                 editor.commit();
