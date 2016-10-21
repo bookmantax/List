@@ -5,25 +5,32 @@ package com.example.brandon.list;
  */
 
 public class FlightItem {
-    public String flightTimes, flightStops, flightAirlineFlight, flightDepartureArrival, flightCapacity;
+    public String flightDepartureTime, flightArrivalTime, flightStops, flightAirlineFlight, flightDeparture,
+            flightArrival, flightCapacity, flightDate;
 
-    public FlightItem(String flightTimes, String flightStops, String flightAirlineFlight,
-                      String flightDepartureArrival, String flightCapacity)
+    public FlightItem(String flightDepartureTime, String flightArrivalTime, String flightStops, String flightAirlineFlight,
+                      String flightDeparture, String flightArrival, String flightCapacity, String flightDate)
     {
-        this.flightTimes = flightTimes;
+        this.flightDepartureTime = flightDepartureTime;
+        this.flightArrivalTime = flightArrivalTime;
         this.flightStops = flightStops;
         this.flightAirlineFlight = flightAirlineFlight;
-        this.flightDepartureArrival = flightDepartureArrival;
+        this.flightDeparture = flightDeparture;
+        this.flightArrival = flightArrival;
         this.flightCapacity = flightCapacity;
+        this.flightDate = flightDate;
     }
 
-    public FlightItem(String flightTimes, String flightStops,
-                      String flightDepartureArrival, String flightCapacity)
+    public FlightItem(String flightDepartureTime, String flightArrivalTime, String flightStops,
+                      String flightDeparture, String flightArrival, String flightCapacity, String flightDate)
     {
-        this.flightTimes = flightTimes;
+        this.flightDepartureTime = flightDepartureTime;
+        this.flightArrivalTime = flightArrivalTime;
         this.flightStops = flightStops;
-        this.flightDepartureArrival = flightDepartureArrival;
+        this.flightDeparture = flightDeparture;
+        this.flightArrival = flightArrival;
         this.flightCapacity = flightCapacity;
         this.flightAirlineFlight = "";
+        this.flightDate = flightDate;
     }
 }

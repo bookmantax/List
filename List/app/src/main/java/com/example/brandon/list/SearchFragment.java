@@ -16,8 +16,10 @@ import android.widget.EditText;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Brandon on 10/18/2016.
@@ -92,5 +94,11 @@ public class SearchFragment extends android.support.v4.app.Fragment
             return true;
         }
         return false;
+    }
+
+
+
+
+    private void test(){
     }
 }
