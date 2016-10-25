@@ -1,5 +1,6 @@
 package com.example.brandon.list;
 
+import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -19,9 +20,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +47,9 @@ public class ResultsFragment extends android.support.v4.app.Fragment
     private List<FlightDetails> ratings;
     private FlightItem expItem;
     private FlightDetails expDetails;
-    private String departingLocation, arrivingLocation;
+    private String departingLocation, arrivingLocation, dateString;
+    private int year, month, day;
+    private Date date = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,7 +59,18 @@ public class ResultsFragment extends android.support.v4.app.Fragment
         editor = settings.edit();
         departingLocation = settings.getString("DepartingLocation", "");
         arrivingLocation = settings.getString("ArrivingLocation", "");
-        getFlights();
+        year = settings.getInt("Year", 0);
+        month = settings.getInt("Month", 0);
+        day = settings.getInt("Day", 0);
+        if(year != 0 && month != 0 && day != 0)
+        {
+            date = new Date(year, month, day);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            dateString = sdf.format(date);
+        }
+        if(date != null) {
+            getFlights();
+        }
     }
 
     @Nullable
@@ -74,7 +92,7 @@ public class ResultsFragment extends android.support.v4.app.Fragment
     private void getFlights() {
         // Instantiate the RequestQueue.
         com.android.volley.RequestQueue queue = Volley.newRequestQueue(getContext());
-        String url = "https://api.test.sabre.com/v1/shop/flights?origin=JFK&destination=LAX&departuredate=2017-01-07&returndate=2017-01-08&onlineitinerariesonly=N&limit=10&offset=1&eticketsonly=N&sortby=totalfare&order=asc&sortby2=departuretime&order2=asc&pointofsalecountry=US";
+        String url = getString(R.string.flights_search_url);
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -82,7 +100,30 @@ public class ResultsFragment extends android.support.v4.app.Fragment
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        String s = response;
+                        if(response != null) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                if(!jsonObject.getJSONArray("PricedItineraries").isNull(0)){
+                                    JSONArray allFlights = jsonObject.getJSONArray("PricedItineraries");
+                                    for(int i = 0; i < allFlights.length(); i++){
+                                        JSONArray airItinerary = allFlights.getJSONObject(i).getJSONObject("AirItinerary")
+                                                .getJSONObject("OriginDestinationOptions").getJSONArray("OriginDestinationOption");
+                                        for(int j = 0; j < airItinerary.length(); j++){
+                                            JSONArray flightSegments = airItinerary.getJSONObject(j).getJSONArray("FlightSegment");
+                                            for(int k = 0; k < flightSegments.length(); k++){
+                                                JSONObject flightObject = flightSegments.getJSONObject(k);
+                                                FlightItem flight = new FlightItem(flightObject.getString("DepartureDateTime"),
+                                                        flightObject.getString("ArrivalDateTime"), flightSegments.length(),
+                                                        flightObject.getString("MarketingAirline"), flightObject.getString("DepartureAirport"),
+                                                        flightObject.getString("ArrivalAirport"), 0, flightObject.getString("MarketingAirline"));
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -90,6 +131,24 @@ public class ResultsFragment extends android.support.v4.app.Fragment
             }
 
         }) {
+            @Override
+            protected Map<String,String> getParams() {
+                // something to do here ??
+                Map<String, String> params = new HashMap<>();
+                params.put("origin", "JFK");
+                params.put("destination", "LAX");
+                params.put("departuredate", "2017-01-07");
+                params.put("returndate", "2017-01-08");
+                params.put("eticketsonly", "N");
+                params.put("sortby", "departuretime");
+                params.put("order", "asc");
+                params.put("sortby2", "elapsedtime");
+                params.put("order2", "asc");
+                params.put("pointofsalecountry", "US");
+
+                return params;
+            }
+
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();

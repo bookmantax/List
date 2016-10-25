@@ -131,7 +131,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void DeleteOldTrips(SQLiteDatabase db){
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         String todayString = df.format(c.getTime());
         Date today = new Date();
         try {

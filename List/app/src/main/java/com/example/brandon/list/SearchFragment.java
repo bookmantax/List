@@ -74,6 +74,8 @@ public class SearchFragment extends android.support.v4.app.Fragment
 
     private void Submit()
     {
+        departingLocation = String.valueOf(searchDepartingEditText.getText());
+        arrivingLocation = String.valueOf(searchArrivingEditText.getText());
         if (NecessaryInformationProvided(departingLocation, arrivingLocation))
         {
             editor.putString("DepartingLocation", departingLocation);
@@ -89,16 +91,10 @@ public class SearchFragment extends android.support.v4.app.Fragment
 
     private boolean NecessaryInformationProvided(String departingLocation, String arrivingLocation)
     {
-        if(departingLocation != null && arrivingLocation != null)
+        if(departingLocation != "" && arrivingLocation != "")
         {
             return true;
         }
         return false;
-    }
-
-
-
-
-    private void test(){
     }
 }

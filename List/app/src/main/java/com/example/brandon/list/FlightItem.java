@@ -5,11 +5,12 @@ package com.example.brandon.list;
  */
 
 public class FlightItem {
-    public String flightDepartureTime, flightArrivalTime, flightStops, flightAirlineFlight, flightDeparture,
-            flightArrival, flightCapacity, flightDate;
+    public String flightDepartureTime, flightArrivalTime, flightAirlineFlight, flightDeparture,
+            flightArrival, flightDate;
+    public int flightStops, flightCapacity;
 
-    public FlightItem(String flightDepartureTime, String flightArrivalTime, String flightStops, String flightAirlineFlight,
-                      String flightDeparture, String flightArrival, String flightCapacity, String flightDate)
+    public FlightItem(String flightDepartureTime, String flightArrivalTime, int flightStops, String flightAirlineFlight,
+                      String flightDeparture, String flightArrival, int flightCapacity, String flightDate)
     {
         this.flightDepartureTime = flightDepartureTime;
         this.flightArrivalTime = flightArrivalTime;
@@ -21,8 +22,8 @@ public class FlightItem {
         this.flightDate = flightDate;
     }
 
-    public FlightItem(String flightDepartureTime, String flightArrivalTime, String flightStops,
-                      String flightDeparture, String flightArrival, String flightCapacity, String flightDate)
+    public FlightItem(String flightDepartureTime, String flightArrivalTime, int flightStops,
+                      String flightDeparture, String flightArrival, int flightCapacity, String flightDate)
     {
         this.flightDepartureTime = flightDepartureTime;
         this.flightArrivalTime = flightArrivalTime;

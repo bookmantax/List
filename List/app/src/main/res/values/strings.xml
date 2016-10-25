@@ -3,4 +3,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    <string name="seat_map_url">https://api.test.sabre.com/v4.0.0/book/flights/seatmaps</string>
+    <string name="flights_search_url">https://api.test.sabre.com/v1/shop/flights</string>
 </resources>
