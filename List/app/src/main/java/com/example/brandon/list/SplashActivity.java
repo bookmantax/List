@@ -92,7 +92,7 @@ public class SplashActivity extends AppCompatActivity {
         int secondsDelayed = 3;
         new Handler().postDelayed(new Runnable() {
             public void run() {
-                if (settings.getInt("UserId", 0) == 0)
+                if (settings.getInt("UserId", 0) != 0)
                 {
                     startActivity(new Intent(SplashActivity.this, SignupActivity.class));
                 }
