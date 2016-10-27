@@ -77,15 +77,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Add trip to the Database
      */
-    public boolean InsertFlight(String departureTime, String arrivalTime, String airline, int flightNumber,
-                                String departureAirport, String arrivalAirport, int tripId){
+    public boolean InsertFlight(int flightNumber, int tripId){
         SQLiteDatabase db = this.getReadableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DEPARTURE_AIRPORT, departureAirport);
-        contentValues.put(ARRIVAL_AIRPORT, arrivalAirport);
-        contentValues.put(DEPARTURE_TIME, departureTime);
-        contentValues.put(ARRIVAL_TIME, arrivalTime);
-        contentValues.put(AIRLINE, airline);
         contentValues.put(FLIGHT_NUMBER, flightNumber);
         contentValues.put(TRIP_ID, tripId);
         long result = db.insert(FLIGHT_TABLE_NAME, null, contentValues);

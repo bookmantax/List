@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 
@@ -19,11 +21,14 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
     private AHBottomNavigation bottomBar;
     private boolean startUp, search;
     private DatabaseHelper db;
+    private static MainActivity sInstance;
+    private RequestQueue mRequestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sInstance = this;
         startUp = true;
         search = false;
         db = new DatabaseHelper(this);
@@ -31,6 +36,22 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         bottomBar = (AHBottomNavigation)findViewById(R.id.mainNavBar);
         bottomBar.setOnTabSelectedListener(this);
         this.CreateNavItems();
+    }
+
+    public static synchronized MainActivity getInstance() {
+        return sInstance;
+    }
+
+
+
+    public RequestQueue getRequestQueue() {
+        // lazy initialize the request queue, the queue instance will be
+        // created when it is accessed for the first time
+        if (mRequestQueue == null) {
+            mRequestQueue = Volley.newRequestQueue(getApplicationContext());
+        }
+
+        return mRequestQueue;
     }
 
     private void CreateNavItems()
@@ -95,8 +116,10 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         Cursor lastTrip;
         FlightDetails flightDetail;
         int lastTripId;
+        String departureDate = flightItem.flightDepartureTime.substring(0, 10);
+        String arrivalDate = flightItem.flightArrivalTime.substring(0, 10);
         db.InsertTrip(flightDetails.size(), flightItem.flightDeparture, flightItem.flightArrival,
-                flightItem.flightDepartureTime, flightItem.flightArrivalTime, flightItem.flightDate);
+                flightItem.flightDepartureTime, flightItem.flightArrivalTime, departureDate + " - " + arrivalDate);
 
         lastTrip = db.GetLastTrip();
         lastTrip.moveToFirst();
@@ -105,8 +128,7 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         for(int i = 0; i < flightDetails.size(); i++)
         {
             flightDetail = flightDetails.get(i);
-            db.InsertFlight(flightDetail.flightDetailsDepartureTime, flightDetail.flightDetailsArrivalTime, flightDetail.flightDetailsAirline,
-                    flightDetail.flightDetailsFlightNumber, flightDetail.flightDetailsDepartureAirport, flightDetail.flightDetailsArrivalAirport, lastTripId);
+            db.InsertFlight(Integer.getInteger(flightDetail.flightDetailsFlightNumber), lastTripId);
         }
     }
 }

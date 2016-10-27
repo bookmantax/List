@@ -1,6 +1,7 @@
 package com.example.brandon.list;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,18 +11,23 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import JsonObjects.SeatMap;
 
 /**
  * Created by Brandon on 10/19/2016.
@@ -41,49 +47,112 @@ public class FlightExpandableListAdapter extends BaseExpandableListAdapter {
         this._listDataHeader = listDataHeader;
     }
 
-    public void GetFlightDetails(Context context)
+    public void GetFlightDetails(final Context context)
     {
+        final int numAvailableSeats;
         if(_listDataChild != null){
             for(int i = 0; i < _listDataChild.size(); i++){
-                List<FlightDetails> flights = _listDataChild.get(_listDataHeader.get(i));
+                final List<FlightDetails> flights = _listDataChild.get(_listDataHeader.get(i));
+                FlightItem flightItem = _listDataHeader.get(i);
                 for(int j = 0; j < flights.size(); j++){
                     // Instantiate the RequestQueue.
                     com.android.volley.RequestQueue queue = Volley.newRequestQueue(context);
-                    String url = "https://api.test.sabre.com/v1/shop/flights?origin=JFK&destination=LAX&departuredate=2017-01-07&returndate=2017-01-08&onlineitinerariesonly=N&limit=10&offset=1&eticketsonly=N&sortby=totalfare&order=asc&sortby2=departuretime&order2=asc&pointofsalecountry=US";
+                    String url = context.getString(R.string.seat_map_url);
+                    String departureDate = flightItem.flightDepartureTime.substring(0, 10);
+                    String arrivalDate = flightItem.flightArrivalTime.substring(0, 10);
 
-                    // Request a string response from the provided URL.
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    // Display the first 500 characters of the response string.
-                                    if(response != null) {
-                                        try {
-                                            JSONObject jsonObject = new JSONObject(response);
+                    try {
+                        com.android.volley.RequestQueue requestQueue = MainActivity.getInstance().getRequestQueue();
+                        final SeatMap seatMap = new SeatMap(flightItem.flightArrival, flightItem.flightDeparture, departureDate, arrivalDate, flightItem.flightAirlineFlight);
+                        final String mRequestBody = seatMap.GetSeatMapRequestBody();
 
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
+                        JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                if(response != null){
+                                    try{
+                                        JSONObject object = response.getJSONObject("EnhancedSeatMapRS");
+                                        JSONArray seatMapArray = object.getJSONArray("SeatMap");
+                                        int numSeats = 0;
+                                        String flightNumber = "";
+                                        for(int i = 0; i < seatMapArray.length(); i++){
+                                            JSONObject flight = seatMapArray.getJSONObject(i).getJSONObject("Flight");
+                                            JSONArray flightMarketingArrayForFlightNumber = flight.getJSONArray("Marketing");
+                                            for(int j = 0; j < flightMarketingArrayForFlightNumber.length(); j++){
+                                                flightNumber = flightMarketingArrayForFlightNumber.getJSONObject(j).getString("content");
+                                            }
+                                            JSONArray cabinSeatMap = seatMapArray.getJSONObject(i).getJSONArray("Cabin");
+                                            for(int j = 0; j < cabinSeatMap.length(); j++){
+                                                JSONArray cabinRows = cabinSeatMap.getJSONObject(j).getJSONArray("Row");
+                                                for(int k = 0; k < cabinRows.length(); k++){
+                                                    JSONArray rowSeats = cabinRows.getJSONObject(k).getJSONArray("Seat");
+                                                    for(int l = 0; l < rowSeats.length(); l++){
+                                                        if(!rowSeats.getJSONObject(l).isNull("Occupation")) {
+                                                            JSONArray occupiedSeat = rowSeats.getJSONObject(l).getJSONArray("Occupation");
+                                                            for (int m = 0; m < occupiedSeat.length(); m++) {
+                                                                JSONObject seatDetails = occupiedSeat.getJSONObject(m).getJSONObject("Detail");
+                                                                if (seatDetails.getString("content").equalsIgnoreCase("SeatIsFree")) {
+                                                                    numSeats += 1;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
+                                        if(flightNumber.charAt(0) == '0'){
+                                            flightNumber = flightNumber.substring(1, flightNumber.length());
+                                        }
+                                        for(int i = 0; i < flights.size(); i++){
+                                            FlightDetails flightToUpdateSeats = flights.get(i);
+                                            if(flightToUpdateSeats.flightDetailsFlightNumber.equalsIgnoreCase("399")){
+                                                flightToUpdateSeats.flightDetailsSeatAvailability = String.valueOf(numSeats);
+                                            }
+                                        }
+                                    } catch(Exception e){
+                                        e.printStackTrace();
                                     }
                                 }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                        }
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.e("VOLLEY", error.toString());
+                            }
+                        }) {
+                            @Override
+                            public String getBodyContentType() {
+                                return "application/json; charset=utf-8";
+                            }
 
-                    })
-                    {
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("Authorization", "Bearer " + "T1RLAQLL0SbnLEg59pULOPhiuEfngaZBQBC/2aN2fFY+cqW/tF5vpd23AACgnyHiES1UgKwDeyNBbeOznfO0s9jkobJjX+LsyYXt42ml+x/gIEa9SEr6tzaLeSt+2X/QVC1zgRguWa93S6jGyxSUqunkgNfwyfBdT7u/EJ/dpMjdGN3qk24E9TUk6vgRPXKiZiRqzlqNWEZgGiCj8dSDV3Qt5SsxxdK1WlRLt8DJJ4y5x0LhP3UeD/TxUNBIOV0ujHKlHM+kFuHK5EWmiw**");
-                            params.put("Accept", "*/*");
+                            @Override
+                            public byte[] getBody() {
+                                try {
+                                    return mRequestBody == null ? null : mRequestBody.getBytes("utf-8");
+                                } catch (UnsupportedEncodingException uee) {
+                                    uee.printStackTrace();
+                                    return null;
+                                }
+                            }
 
-                            return params;
-                        }
-                    };
-                    // Add the request to the RequestQueue.
-                    queue.add(stringRequest);
+                            @Override
+                            public Map<String, String> getHeaders() throws AuthFailureError {
+                                Map<String, String> params = new HashMap<String, String>();
+                                params.put("Authorization", "Bearer " + context.getString(R.string.authentication_key));
+                                params.put("Accept", "*/*");
+
+                                return params;
+                            }
+                        };
+
+                        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                                60000,
+                                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                        requestQueue.add(stringRequest);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -114,7 +183,7 @@ public class FlightExpandableListAdapter extends BaseExpandableListAdapter {
         final Button bookmarkButtons = (Button) row
                 .findViewById(R.id.flightDetailsBookmarkButton);
 
-        seatsAvailable.setText(childDetails.flightDetailsSeatAvailabilityTextView);
+        seatsAvailable.setText(childDetails.flightDetailsSeatAvailability);
         if(flightItem.flightArrival == "") {
             bookmarkButtons.setOnClickListener(new View.OnClickListener() {
                 @Override

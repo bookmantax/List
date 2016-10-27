@@ -4,6 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
-    <string name="seat_map_url">https://api.test.sabre.com/v4.0.0/book/flights/seatmaps</string>
-    <string name="flights_search_url">https://api.test.sabre.com/v1/shop/flights</string>
+    <string name="flights_url">https://api.test.sabre.com/v1/shop/flights</string>
+    <string name="seat_map_url">https://api.test.sabre.com/v4.0.0/book/flights/seatmaps?mode=seatmaps</string>
+    <string name="authentication_key">T1RLAQI+EaGMel91rdqdk9jYdMHXi4NXvRBmKYeDvs7KqihiSInnRaMsAADAkYoe6/ezgqlONbPQByn0zghURh8fCsDTn+JmIaG5T611pvidu137zI7wA4fBEhD1rmmPkb4WGk+jI1WqV2D+H4+u4Ueizp3ENgCzskD2rPDlekYVIK/nrSJ/HxW5M0Yw//l8bMGDHSZflnAcST09h5ok4DhL+HACZMAwH5Fp8lqnWSyo3JJQCkIL/nO1gOjyUe6XUz7SQbzYGM+UEGfk/005VYm43xGjtBv4EnTcXpIdY7upNMBDTaTrv0UOwtSN</string>
 </resources>

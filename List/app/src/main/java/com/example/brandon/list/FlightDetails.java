@@ -5,19 +5,11 @@ package com.example.brandon.list;
  */
 
 public class FlightDetails {
-    public String flightDetailsSeatAvailabilityTextView, flightDetailsDepartureAirport, flightDetailsArrivalAirport,
-    flightDetailsDepartureTime, flightDetailsArrivalTime, flightDetailsAirline;
-    public int flightDetailsFlightNumber;
+    public String flightDetailsSeatAvailability, flightDetailsFlightNumber;
 
-    public FlightDetails(String flightDetailsSeatAvailabilityTextView, String flightDetailsDepartureAirport, String flightDetailsArrivalAirport,
-                         String flightDetailsDepartureTime, String flightDetailsArrivalTime, String flightDetailsAirline, int flightDetailsFlightNumber)
+    public FlightDetails(String flightDetailsSeatAvailability, String flightDetailsFlightNumber)
     {
-        this.flightDetailsSeatAvailabilityTextView = flightDetailsSeatAvailabilityTextView;
-        this.flightDetailsDepartureAirport = flightDetailsDepartureAirport;
-        this.flightDetailsArrivalAirport = flightDetailsArrivalAirport;
-        this.flightDetailsDepartureTime = flightDetailsDepartureTime;
-        this.flightDetailsArrivalTime = flightDetailsArrivalTime;
-        this.flightDetailsAirline = flightDetailsAirline;
+        this.flightDetailsSeatAvailability = flightDetailsSeatAvailability;
         this.flightDetailsFlightNumber = flightDetailsFlightNumber;
     }
 }

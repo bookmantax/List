@@ -33,15 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import JsonObjects.ArrivalDate;
-import JsonObjects.CabinDefinition;
-import JsonObjects.DepartureDate;
-import JsonObjects.EnhancedSeatMapRQ;
-import JsonObjects.Flight;
-import JsonObjects.Marketing;
-import JsonObjects.Operating;
-import JsonObjects.SeatMapQueryEnhanced;
-
 /**
  * Created by Brandon on 10/18/2016.
  */
@@ -55,10 +46,11 @@ public class ResultsFragment extends android.support.v4.app.Fragment
     private FlightExpandableListAdapter flightAdapter;
     private List<FlightItem> listDataHeader;
     private HashMap<FlightItem, List<FlightDetails>> listDataChild;
-    private List<FlightDetails> ratings;
+    private List<FlightDetails> flightDetailsList;
+    private List<String> flightTimes;
     private FlightItem flightItem;
     private FlightDetails flightDetails;
-    private String departingLocation, arrivingLocation, dateString;
+    private String departingLocation, arrivingLocation, dateString, airline;
     private int year, month, day;
     private Date date = null;
 
@@ -82,7 +74,7 @@ public class ResultsFragment extends android.support.v4.app.Fragment
             dateString = sdf.format(date);
         }
         if(date != null) {
-            getFlights();
+            GetFlights();
         }
     }
 
@@ -102,129 +94,9 @@ public class ResultsFragment extends android.support.v4.app.Fragment
         return rootView;
     }
 
-    private void getFlights() {
-        // Instantiate the RequestQueue.
-        com.android.volley.RequestQueue queue = Volley.newRequestQueue(getContext());
-        String url = "https://api.test.sabre.com/v4.0.0/book/flights/seatmaps?mode=seatmaps";
-
-        DepartureDate departureDate = new DepartureDate("2017-01-07");
-        ArrivalDate arrivalDate = new ArrivalDate("2017-01-08");
-        Operating operating = new Operating("AA", "997");
-        List<Marketing> marketingList = new ArrayList<>();
-        Marketing marketing = new Marketing("AA", "997");
-        marketingList.add(marketing);
-        CabinDefinition cabinDefinition = new CabinDefinition();
-        Flight flight = new Flight("EZE", "DFW", departureDate, arrivalDate, operating, marketingList);
-        SeatMapQueryEnhanced seatMapQueryEnhanced = new SeatMapQueryEnhanced("Payload", flight, cabinDefinition);
-        final EnhancedSeatMapRQ enhancedSeatMapRQ = new EnhancedSeatMapRQ(seatMapQueryEnhanced);
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("EnhancedSeatMapRQ", enhancedSeatMapRQ);
-
-        try {
-            com.android.volley.RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-            Gson gson = new Gson();
-            final String mRequestBody = "{\n" +
-                    "\n" +
-                    "  \"EnhancedSeatMapRQ\": {\n" +
-                    "\n" +
-                    "    \"SeatMapQueryEnhanced\": {\n" +
-                    "\n" +
-                    "      \"RequestType\": \"Payload\",\n" +
-                    "\n" +
-                    "      \"Flight\": {\n" +
-                    "\n" +
-                    "        \"destination\": \"EZE\",\n" +
-                    "\n" +
-                    "        \"origin\": \"DFW\",\n" +
-                    "\n" +
-                    "      \"DepartureDate\": {\n" +
-                    "\n" +
-                    "        \"content\": \"2017-01-07\"\n" +
-                    "\n" +
-                    "      },\n" +
-                    "\n" +
-                    "      \"ArrivalDate\": {\n" +
-                    "\n" +
-                    "        \"content\": \"2017-01-08\"\n" +
-                    "\n" +
-                    "      },\n" +
-                    "\n" +
-                    "      \"Operating\": {\n" +
-                    "\n" +
-                    "        \"carrier\": \"AA\",\n" +
-                    "\n" +
-                    "        \"content\": \"997\"\n" +
-                    "\n" +
-                    "      },\n" +
-                    "\n" +
-                    "      \"Marketing\": [{\n" +
-                    "\n" +
-                    "        \"carrier\": \"AA\",\n" +
-                    "\n" +
-                    "        \"content\": \"997\"\n" +
-                    "\n" +
-                    "      }]\n" +
-                    "\n" +
-                    "      },\n" +
-                    "\n" +
-                    "    \"CabinDefinition\": {\n" +
-                    "\n" +
-                    "      \"RBD\": \"Y\"\n" +
-                    "\n" +
-                    "    }\n" +
-                    "\n" +
-                    "    }\n" +
-                    "\n" +
-                    "  }\n" +
-                    "\n" +
-                    "}";
-
-            JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    Log.i("VOLLEY", response.toString());
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e("VOLLEY", error.toString());
-                }
-            }) {
-                @Override
-                public String getBodyContentType() {
-                    return "application/json; charset=utf-8";
-                }
-
-                @Override
-                public byte[] getBody() {
-                    try {
-                        return mRequestBody == null ? null : mRequestBody.getBytes("utf-8");
-                    } catch (UnsupportedEncodingException uee) {
-                        uee.printStackTrace();
-                        return null;
-                    }
-                }
-
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put("Authorization", "Bearer " + "T1RLAQLL0SbnLEg59pULOPhiuEfngaZBQBC/2aN2fFY+cqW/tF5vpd23AACgnyHiES1UgKwDeyNBbeOznfO0s9jkobJjX+LsyYXt42ml+x/gIEa9SEr6tzaLeSt+2X/QVC1zgRguWa93S6jGyxSUqunkgNfwyfBdT7u/EJ/dpMjdGN3qk24E9TUk6vgRPXKiZiRqzlqNWEZgGiCj8dSDV3Qt5SsxxdK1WlRLt8DJJ4y5x0LhP3UeD/TxUNBIOV0ujHKlHM+kFuHK5EWmiw**");
-                    params.put("Accept", "*/*");
-
-                    return params;
-                }
-            };
-
-            stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                    60000,
-                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            requestQueue.add(stringRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    private void GetFlights() {
+        com.android.volley.RequestQueue queue = MainActivity.getInstance().getRequestQueue();
+        String url = GetFlightsUrl("JFK", "LAX", "2017-01-07");
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -242,19 +114,28 @@ public class ResultsFragment extends android.support.v4.app.Fragment
                                                 .getJSONObject("OriginDestinationOptions").getJSONArray("OriginDestinationOption");
                                         for(int j = 0; j < airItinerary.length(); j++){
                                             JSONArray flightSegments = airItinerary.getJSONObject(j).getJSONArray("FlightSegment");
+                                            flightTimes = new ArrayList<>();
+                                            flightDetailsList = new ArrayList<>();
                                             for(int k = 0; k < flightSegments.length(); k++){
                                                 JSONObject flightObject = flightSegments.getJSONObject(k);
-                                                flightItem = new FlightItem(flightObject.getString("DepartureDateTime"),
-                                                        flightObject.getString("ArrivalDateTime"), flightSegments.length(),
-                                                        flightObject.getJSONObject("MarketingAirline").getString("Code"), flightObject.getJSONObject("DepartureAirport").getString("LocationCode"),
-                                                        flightObject.getJSONObject("ArrivalAirport").getString("LocationCode"), 0, flightObject.getJSONObject("MarketingAirline").getString("Code"));
-                                                listDataHeader.add(flightItem);
+                                                flightTimes.add(flightObject.getString("DepartureDateTime"));
+                                                flightTimes.add(flightObject.getString("ArrivalDateTime"));
+                                                airline = flightObject.getJSONObject("MarketingAirline").getString("Code");
+                                                flightDetails = new FlightDetails("0", flightObject.getJSONObject("OperatingAirline").getString("FlightNumber"));
+                                                flightDetailsList.add(flightDetails);
                                             }
+                                            flightItem = new FlightItem(flightTimes, flightSegments.length(),
+                                                    airline, jsonObject.getString("OriginLocation"), jsonObject.getString("DestinationLocation"),
+                                                    0);
+                                            listDataHeader.add(flightItem);
+                                            listDataChild.put(flightItem, flightDetailsList);
                                         }
                                     }
                                 }
                                 flightAdapter = new FlightExpandableListAdapter(getContext(), listDataHeader, listDataChild);
                                 resultsFlightsExpandableListView.setAdapter(flightAdapter);
+                                flightAdapter.GetFlightDetails(getContext());
+                                flightAdapter.notifyDataSetChanged();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -268,18 +149,9 @@ public class ResultsFragment extends android.support.v4.app.Fragment
         })
         {
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("grant_type", "password");
-                params.put("username", "User0");
-                params.put("password", "Password0");
-                return params;
-            }
-
-            @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("Authorization", "Bearer " + "T1RLAQLL0SbnLEg59pULOPhiuEfngaZBQBC/2aN2fFY+cqW/tF5vpd23AACgnyHiES1UgKwDeyNBbeOznfO0s9jkobJjX+LsyYXt42ml+x/gIEa9SEr6tzaLeSt+2X/QVC1zgRguWa93S6jGyxSUqunkgNfwyfBdT7u/EJ/dpMjdGN3qk24E9TUk6vgRPXKiZiRqzlqNWEZgGiCj8dSDV3Qt5SsxxdK1WlRLt8DJJ4y5x0LhP3UeD/TxUNBIOV0ujHKlHM+kFuHK5EWmiw**");
+                params.put("Authorization", "Bearer " + getString(R.string.authentication_key));
                 params.put("Accept", "*/*");
 
                 return params;
@@ -287,5 +159,11 @@ public class ResultsFragment extends android.support.v4.app.Fragment
         };
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
+    }
+
+    private String GetFlightsUrl(String origin, String destination, String departureDate)
+    {
+        return getString(R.string.flights_url) + "?origin=" + origin + "&destination=" +
+                destination + "&departuredate=" + departureDate + "&returndate=2017-01-08&limit=1&onlineitinerariesonly=N&offset=1&eticketsonly=N&sortby=departuretime&order=asc&sortby2=elapsedtime&order2=asc&pointofsalecountry=US";
     }
 }

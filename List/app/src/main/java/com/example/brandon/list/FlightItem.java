@@ -1,29 +1,32 @@
 package com.example.brandon.list;
 
+import java.util.List;
+
+import static android.R.id.list;
+
 /**
  * Created by Brandon on 10/19/2016.
  */
 
 public class FlightItem {
     public String flightDepartureTime, flightArrivalTime, flightAirlineFlight, flightDeparture,
-            flightArrival, flightDate;
+            flightArrival;
     public int flightStops, flightCapacity;
 
-    public FlightItem(String flightDepartureTime, String flightArrivalTime, int flightStops, String flightAirlineFlight,
-                      String flightDeparture, String flightArrival, int flightCapacity, String flightDate)
+    public FlightItem(List<String> flightTimes, int flightStops, String flightAirlineFlight,
+                      String flightDeparture, String flightArrival, int flightCapacity)
     {
-        this.flightDepartureTime = flightDepartureTime;
-        this.flightArrivalTime = flightArrivalTime;
+        this.flightDepartureTime = flightTimes.get(0);
+        this.flightArrivalTime = flightTimes.get(flightTimes.size() - 1);
         this.flightStops = flightStops;
         this.flightAirlineFlight = flightAirlineFlight;
         this.flightDeparture = flightDeparture;
         this.flightArrival = flightArrival;
         this.flightCapacity = flightCapacity;
-        this.flightDate = flightDate;
     }
 
     public FlightItem(String flightDepartureTime, String flightArrivalTime, int flightStops,
-                      String flightDeparture, String flightArrival, int flightCapacity, String flightDate)
+                      String flightDeparture, String flightArrival, int flightCapacity)
     {
         this.flightDepartureTime = flightDepartureTime;
         this.flightArrivalTime = flightArrivalTime;
@@ -32,6 +35,5 @@ public class FlightItem {
         this.flightArrival = flightArrival;
         this.flightCapacity = flightCapacity;
         this.flightAirlineFlight = "";
-        this.flightDate = flightDate;
     }
 }
