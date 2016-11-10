@@ -7,13 +7,14 @@ package JsonObjects;
 public class SeatMap {
     private String seatMapRequestBody;
 
-    public SeatMap(String destination, String origin, String departureDate, String arrivalDate, String carrier)
+    public SeatMap(String destination, String origin, String departureDate, String arrivalDate, String carrier, String flightNumber)
     {
-        origin = "DFW";
-        destination = "EZE";
-        departureDate = "2017-01-07";
-        arrivalDate = "2017-01-08";
-        carrier = "AA";
+//        origin = "DFW";
+//        destination = "EZE";
+//        departureDate = "2017-01-07";
+//        arrivalDate = "2017-01-08";
+//        carrier = "AA";
+//        flightNumber = "997";
         seatMapRequestBody = "{\n" +
                 "\n" +
                 "  \"EnhancedSeatMapRQ\": {\n" +
@@ -24,35 +25,35 @@ public class SeatMap {
                 "\n" +
                 "      \"Flight\": {\n" +
                 "\n" +
-                "        \"destination\": \"EZE\",\n" +
+                "        \"destination\": \"" + destination + "\",\n" +
                 "\n" +
-                "        \"origin\": \"DFW\",\n" +
+                "        \"origin\": \"" + origin + "\",\n" +
                 "\n" +
                 "      \"DepartureDate\": {\n" +
                 "\n" +
-                "        \"content\": \"2017-01-07\"\n" +
+                "        \"content\": \"" + departureDate + "\"\n" +
                 "\n" +
                 "      },\n" +
                 "\n" +
                 "      \"ArrivalDate\": {\n" +
                 "\n" +
-                "        \"content\": \"2017-01-08\"\n" +
+                "        \"content\": \"" + arrivalDate + "\"\n" +
                 "\n" +
                 "      },\n" +
                 "\n" +
                 "      \"Operating\": {\n" +
                 "\n" +
-                "        \"carrier\": \"AA\",\n" +
+                "        \"carrier\": \"" + carrier + "\",\n" +
                 "\n" +
-                "        \"content\": \"997\"\n" +
+                "        \"content\": \"" + flightNumber + "\"\n" +
                 "\n" +
                 "      },\n" +
                 "\n" +
                 "      \"Marketing\": [{\n" +
                 "\n" +
-                "        \"carrier\": \"AA\",\n" +
+                "        \"carrier\": \"" + carrier + "\",\n" +
                 "\n" +
-                "        \"content\": \"997\"\n" +
+                "        \"content\": \"" + flightNumber + "\"\n" +
                 "\n" +
                 "      }]\n" +
                 "\n" +

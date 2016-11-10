@@ -4,25 +4,41 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:text="Seat Availability:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/textView9" />
+        android:layout_below="@+id/flightDetailsTimeTextView"
+        android:id="@+id/flightDetailsSeatAvailabilityTextView" />
 
     <TextView
+        android:text="TextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/flightDetailsSeatAvailabilityTextView" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/flightDetailsFromToTextView" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/flightDetailsFromToTextView"
+        android:layout_alignParentStart="true"
+        android:id="@+id/flightDetailsTimeTextView" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/flightDetailsAirlineNumberTextView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:text="Bookmark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView9"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/flightDetailsBookmarkButton" />
+        android:id="@+id/flightDetailsBookmarkButton"
+        android:layout_alignBottom="@+id/flightDetailsSeatAvailabilityTextView"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>

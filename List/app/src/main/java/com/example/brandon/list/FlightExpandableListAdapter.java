@@ -38,18 +38,19 @@ public class FlightExpandableListAdapter extends BaseExpandableListAdapter {
     private final Context _context;
     private final List<FlightItem> _listDataHeader;
     private final HashMap<FlightItem, List<FlightDetails>> _listDataChild;
+    private DatabaseHelper db;
 
     public FlightExpandableListAdapter(Context context, List<FlightItem> listDataHeader,
                                        HashMap<FlightItem, List<FlightDetails>> listDataChild)
     {
         this._context = context;
+        db = new DatabaseHelper(context);
         this._listDataChild = listDataChild;
         this._listDataHeader = listDataHeader;
     }
 
     public void GetFlightDetails(final Context context)
     {
-        final int numAvailableSeats;
         if(_listDataChild != null){
             for(int i = 0; i < _listDataChild.size(); i++){
                 final List<FlightDetails> flights = _listDataChild.get(_listDataHeader.get(i));
@@ -63,7 +64,8 @@ public class FlightExpandableListAdapter extends BaseExpandableListAdapter {
 
                     try {
                         com.android.volley.RequestQueue requestQueue = MainActivity.getInstance().getRequestQueue();
-                        final SeatMap seatMap = new SeatMap(flightItem.flightArrival, flightItem.flightDeparture, departureDate, arrivalDate, flightItem.flightAirlineFlight);
+                        final SeatMap seatMap = new SeatMap(flightItem.flightArrival, flightItem.flightDeparture, departureDate, arrivalDate, flightItem.flightAirlineFlight,
+                                flights.get(j).flightDetailsFlightNumber);
                         final String mRequestBody = seatMap.GetSeatMapRequestBody();
 
                         JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
@@ -84,15 +86,17 @@ public class FlightExpandableListAdapter extends BaseExpandableListAdapter {
                                             JSONArray cabinSeatMap = seatMapArray.getJSONObject(i).getJSONArray("Cabin");
                                             for(int j = 0; j < cabinSeatMap.length(); j++){
                                                 JSONArray cabinRows = cabinSeatMap.getJSONObject(j).getJSONArray("Row");
-                                                for(int k = 0; k < cabinRows.length(); k++){
-                                                    JSONArray rowSeats = cabinRows.getJSONObject(k).getJSONArray("Seat");
-                                                    for(int l = 0; l < rowSeats.length(); l++){
-                                                        if(!rowSeats.getJSONObject(l).isNull("Occupation")) {
-                                                            JSONArray occupiedSeat = rowSeats.getJSONObject(l).getJSONArray("Occupation");
-                                                            for (int m = 0; m < occupiedSeat.length(); m++) {
-                                                                JSONObject seatDetails = occupiedSeat.getJSONObject(m).getJSONObject("Detail");
-                                                                if (seatDetails.getString("content").equalsIgnoreCase("SeatIsFree")) {
-                                                                    numSeats += 1;
+                                                for(int k = 0; k < cabinRows.length(); k++) {
+                                                    if (!cabinRows.getJSONObject(k).isNull("Seat")){
+                                                        JSONArray rowSeats = cabinRows.getJSONObject(k).getJSONArray("Seat");
+                                                        for (int l = 0; l < rowSeats.length(); l++) {
+                                                            if (!rowSeats.getJSONObject(l).isNull("Occupation")) {
+                                                                JSONArray occupiedSeat = rowSeats.getJSONObject(l).getJSONArray("Occupation");
+                                                                for (int m = 0; m < occupiedSeat.length(); m++) {
+                                                                    JSONObject seatDetails = occupiedSeat.getJSONObject(m).getJSONObject("Detail");
+                                                                    if (seatDetails.getString("content").equalsIgnoreCase("SeatIsFree")) {
+                                                                        numSeats += 1;
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -105,7 +109,7 @@ public class FlightExpandableListAdapter extends BaseExpandableListAdapter {
                                         }
                                         for(int i = 0; i < flights.size(); i++){
                                             FlightDetails flightToUpdateSeats = flights.get(i);
-                                            if(flightToUpdateSeats.flightDetailsFlightNumber.equalsIgnoreCase("399")){
+                                            if(flightToUpdateSeats.flightDetailsFlightNumber.equalsIgnoreCase(flightNumber)){
                                                 flightToUpdateSeats.flightDetailsSeatAvailability = String.valueOf(numSeats);
                                             }
                                         }
@@ -180,20 +184,27 @@ public class FlightExpandableListAdapter extends BaseExpandableListAdapter {
 
         final TextView seatsAvailable = (TextView) row
                 .findViewById(R.id.flightDetailsSeatAvailabilityTextView);
+        seatsAvailable.setText(childDetails.flightDetailsSeatAvailability);
+        final TextView toFromTextView = (TextView)row
+                .findViewById(R.id.flightDetailsFromToTextView);
+        toFromTextView.setText(childDetails.flightDetailsDepartureAirport + " -> " + childDetails.flightDetailsArrivalAirport);
+        final TextView airlineFlightNumber = (TextView)row
+                .findViewById(R.id.flightDetailsAirlineNumberTextView);
+        airlineFlightNumber.setText(flightItem.flightAirlineFlight + " " + childDetails.flightDetailsFlightNumber);
+        final TextView timeTextView = (TextView)row
+                .findViewById(R.id.flightDetailsTimeTextView);
+        timeTextView.setText(childDetails.flightDetailsDepartureTime + " -> " + childDetails.flightDetailsArrivalTime);
+
         final Button bookmarkButtons = (Button) row
                 .findViewById(R.id.flightDetailsBookmarkButton);
-
-        seatsAvailable.setText(childDetails.flightDetailsSeatAvailability);
-        if(flightItem.flightArrival == "") {
-            bookmarkButtons.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //TODO save flight in bookmarks table of phone database
-                }
-            });
-        } else {
-            bookmarkButtons.setVisibility(View.GONE);
-        }
+        bookmarkButtons.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.InsertFlight(childDetails.flightDetailsDepartureTime, childDetails.flightDetailsArrivalTime, Integer.getInteger(childDetails.flightDetailsFlightNumber),
+                        flightItem.flightAirlineFlight, childDetails.flightDetailsDepartureAirport, childDetails.flightDetailsArrivalAirport,
+                        childDetails.flightDetailsArrivalDate, childDetails.flightDetailsDepartureDate);
+            }
+        });
         return row;
     }
 
@@ -243,14 +254,6 @@ public class FlightExpandableListAdapter extends BaseExpandableListAdapter {
         TextView flightAirlineFlight = (TextView) convertView
                 .findViewById(R.id.flightAirlineFlightTextView);
         flightAirlineFlight.setText(flightItem.flightAirlineFlight);
-
-        TextView flightCapacity = (TextView) convertView
-                .findViewById(R.id.flightCapacityTextView);
-        flightCapacity.setText(String.valueOf(flightItem.flightCapacity));
-
-        TextView flightDepartureArrival = (TextView) convertView
-                .findViewById(R.id.flightDepartureArrivalTextView);
-        flightDepartureArrival.setText(flightItem.flightDeparture + " - " + flightItem.flightArrival);
 
         return convertView;
     }

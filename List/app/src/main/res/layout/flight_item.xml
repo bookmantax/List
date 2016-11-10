@@ -21,17 +21,4 @@
         android:layout_centerHorizontal="true"
         android:id="@+id/flightAirlineFlightTextView" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/flightCapacityTextView" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/flightStopsTextView"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/flightDepartureArrivalTextView" />
 </RelativeLayout>

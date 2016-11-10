@@ -60,65 +60,7 @@ public class SignupActivity extends AppCompatActivity
 
         if(RequiredInformationProvided(firstName, lastName, emailAddress))
         {
-            //Service call to create user
-            try {
-                RequestParams params = new RequestParams();
-                JSONObject object = new JSONObject();
-                object.put("firstName", firstName);
-                object.put("lastName", lastName);
-                object.put("emailAddress", emailAddress);
-                params.put("data", object.toString());
-                //TODO create API for List User creation
-                new Thread(new AsyncDownload("",
-                        params, false, null) {
-                    @Override
-                    protected void onPostExecute(String result, Object notes)
-                    {
-                        super.onPostExecute(result, notes);
-                        String s = result;
-                        if (s != null && s.equalsIgnoreCase("Missing Information")) {
-                            signupResponseTextView.setText("Something went wrong please try again.");
-                            signupResponseTextView.setTextColor(Color.RED);
-                            createUserButton.setEnabled(true);
-                            signupProgressBar.setVisibility(View.GONE);
-                        }
-                        else if(s!= null)
-                        {
-                            //Store user info in Shared Preferences
-                            settings = getSharedPreferences("UserPreferences", 0);
-                            editor = settings.edit();
-                            try {
-                                JSONObject oneObject = new JSONObject(result);
-                                // Pulling items from the array
-                                editor.putInt("UserId", Integer.valueOf(oneObject.getString("UserId")));
-                                editor.putString("FirstName", oneObject.getString("FirstName"));
-                                editor.putString("Lastname", oneObject.getString("LastName"));
-                                editor.putString("EmailAddress", oneObject.getString("EmailAddress"));
-                                editor.putString("Airline", oneObject.getString("Airline"));
-                                editor.putString("Username", oneObject.getString("Username"));
-                                editor.putString("Password", oneObject.getString("Password"));
-                                editor.commit();
 
-                            } catch (JSONException e) {
-                                // Oops
-                            }
-                            signupProgressBar.setVisibility(View.GONE);
-                            //Send user to search page.
-                            Intent activity = new Intent(SignupActivity.this, MainActivity.class);
-                            startActivity(activity);
-                            finish();
-                        }
-                        else{
-                            signupResponseTextView.setText("Something went wrong please try again.");
-                            signupResponseTextView.setTextColor(Color.RED);
-                            createUserButton.setEnabled(true);
-                            signupProgressBar.setVisibility(View.GONE);
-                        }
-                    }
-                }).start();
-            } catch (Exception e) {
-
-            }
         }
         else
         {

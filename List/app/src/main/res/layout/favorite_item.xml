@@ -4,9 +4,29 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:text="TextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/favoriteDepartureArrivalTextView"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentStart="true"
+        android:id="@+id/favoriteItemFirstTextView"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/favoriteItemFirstTextView"
+        android:layout_toEndOf="@+id/favoriteItemFirstTextView"
+        android:id="@+id/favoriteItemSecondTextView"
+        android:layout_marginRight="10dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/favoriteItemSecondTextView"
+        android:layout_toEndOf="@+id/favoriteItemSecondTextView"
+        android:id="@+id/favoriteItemThirdTextView" />
 </RelativeLayout>

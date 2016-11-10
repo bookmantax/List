@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/favoritesAddFavoriteButton"
-        android:layout_above="@+id/mainNavBar"
+        android:layout_above="@+id/favoritesChangeDateButton"
         android:layout_centerHorizontal="true"
         android:id="@+id/favoritesResultsListView" />
 
@@ -34,4 +34,22 @@
         android:layout_alignParentBottom="true"
         >
     </com.aurelhubert.ahbottomnavigation.AHBottomNavigation>
+
+    <Button
+        android:text="Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/favoritesChangeDateButton"
+        android:layout_alignBottom="@+id/mainNavBar"
+        android:layout_toStartOf="@+id/textView8" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/favoritesChangeDateButton"
+        android:id="@+id/favoritesDateTextView"
+        android:layout_below="@+id/favoritesResultsListView"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_vertical" />
 </RelativeLayout>

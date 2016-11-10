@@ -54,20 +54,100 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/searchArrivingEditText"
         android:layout_alignParentStart="true"
-        android:id="@+id/searchDateTextView" />
+        android:id="@+id/searchDateTextView"
+        android:layout_marginBottom="50dp" />
 
-    <DatePicker
+    <TextView
+        android:text="TextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/searchDatePicker"
         android:layout_below="@+id/searchArrivingEditText"
-        android:layout_toEndOf="@+id/searchDateTextView" />
+        android:layout_toEndOf="@+id/searchDateTextView"
+        android:id="@+id/searchDateDepartingTextView"
+        android:layout_marginRight="15dp" />
 
     <Button
-        android:text="Search"
+        android:text="Change Date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_below="@+id/searchDepartingTextView"
+        android:layout_toEndOf="@+id/searchDateDepartingTextView"
+        android:id="@+id/searchChangeDateButton" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/searchDirectCheckBox"
+        android:id="@+id/searchLinearLayoutToggleButtons">
+
+        <ToggleButton
+            android:text="Morning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/searchMorningToggleButton"
+            android:layout_alignTop="@+id/searchDirectFlightsCheckBox"
+            android:layout_alignParentStart="true"
+            android:layout_weight="1"
+            android:checked="false"
+            android:textOff="Morning"
+            android:textOn="Morning" />
+
+        <ToggleButton
+            android:text="Afternoon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/searchMorningToggleButton"
+            android:layout_alignStart="@+id/searchDirectFlightsCheckBox"
+            android:id="@+id/searchAfternoonToggleButton"
+            android:layout_weight="1"
+            android:textOff="Afternoon"
+            android:textOn="Afternoon" />
+
+        <ToggleButton
+            android:text="Night"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/searchAfternoonToggleButton"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/searchNightToggleButton"
+            android:layout_weight="1"
+            android:textOff="Night"
+            android:textOn="Night" />
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchSearchButton"
+        android:text="Search"
         android:layout_centerHorizontal="true"
-        android:id="@+id/searchSearchButton" />
+        android:layout_centerVertical="true" />
+
+    <com.aurelhubert.ahbottomnavigation.AHBottomNavigation
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/mainNavBar"
+        android:layout_alignParentBottom="true"
+        >
+    </com.aurelhubert.ahbottomnavigation.AHBottomNavigation>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchDirectCheckBox"
+        android:text=""
+        android:layout_below="@+id/searchChangeDateButton"
+        android:layout_toRightOf="@+id/textView13"/>
+
+    <TextView
+        android:text="Direct: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView13"
+        android:layout_alignBaseline="@+id/searchDirectCheckBox"
+        android:layout_alignBottom="@+id/searchDirectCheckBox"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>

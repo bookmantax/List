@@ -24,6 +24,10 @@ import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -47,7 +51,7 @@ public class ResultsFragment extends android.support.v4.app.Fragment
     private List<FlightItem> listDataHeader;
     private HashMap<FlightItem, List<FlightDetails>> listDataChild;
     private List<FlightDetails> flightDetailsList;
-    private List<String> flightTimes;
+    private List<String> flightTimes, exclusiveAirlines;
     private FlightItem flightItem;
     private FlightDetails flightDetails;
     private String departingLocation, arrivingLocation, dateString, airline;
@@ -95,33 +99,43 @@ public class ResultsFragment extends android.support.v4.app.Fragment
     }
 
     private void GetFlights() {
+        String url;
         com.android.volley.RequestQueue queue = MainActivity.getInstance().getRequestQueue();
-        String url = GetFlightsUrl("JFK", "LAX", "2017-01-07");
-
+        if(((MainActivity)getContext()).isFavoritesSearch){
+            url = GetFlightsUrl(((MainActivity)getContext()).airlineOrOrigin, ((MainActivity)getContext()).flightNumberOrDestination,
+                    String.valueOf(((MainActivity)getContext()).year) +  "-" + String.valueOf(((MainActivity)getContext()).month) + "-"
+                            + String.valueOf(((MainActivity)getContext()).day));
+        }
+        else {
+            url = GetFlightsUrl(settings.getString("DepartingLocation", ""),
+                    settings.getString("ArrivingLocation", ""), String.valueOf(((MainActivity)getContext()).year) +  "-" +
+                            String.valueOf(((MainActivity)getContext()).month) + "-" + String.valueOf(((MainActivity)getContext()).day));
+        }
+        //TODO handle morning/afternoon/night, direct only booleans, and exclusive airlines (exclusiveAirlines = Arrays.asList(str.split("\\s*,\\s*"));)
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        if(response != null) {
+                        if (response != null) {
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
-                                if(!jsonObject.getJSONArray("PricedItineraries").isNull(0)){
+                                if (!jsonObject.getJSONArray("PricedItineraries").isNull(0)) {
                                     JSONArray allFlights = jsonObject.getJSONArray("PricedItineraries");
-                                    for(int i = 0; i < allFlights.length(); i++){
+                                    for (int i = 0; i < allFlights.length(); i++) {
                                         JSONArray airItinerary = allFlights.getJSONObject(i).getJSONObject("AirItinerary")
                                                 .getJSONObject("OriginDestinationOptions").getJSONArray("OriginDestinationOption");
-                                        for(int j = 0; j < airItinerary.length(); j++){
+                                        for (int j = 0; j < airItinerary.length(); j++) {
                                             JSONArray flightSegments = airItinerary.getJSONObject(j).getJSONArray("FlightSegment");
                                             flightTimes = new ArrayList<>();
                                             flightDetailsList = new ArrayList<>();
-                                            for(int k = 0; k < flightSegments.length(); k++){
+                                            for (int k = 0; k < flightSegments.length(); k++) {
                                                 JSONObject flightObject = flightSegments.getJSONObject(k);
                                                 flightTimes.add(flightObject.getString("DepartureDateTime"));
                                                 flightTimes.add(flightObject.getString("ArrivalDateTime"));
                                                 airline = flightObject.getJSONObject("MarketingAirline").getString("Code");
-                                                flightDetails = new FlightDetails("0", flightObject.getJSONObject("OperatingAirline").getString("FlightNumber"));
+                                                //flightDetails = new FlightDetails("0", flightObject.getJSONObject("OperatingAirline").getString("FlightNumber"));
                                                 flightDetailsList.add(flightDetails);
                                             }
                                             flightItem = new FlightItem(flightTimes, flightSegments.length(),
@@ -146,8 +160,7 @@ public class ResultsFragment extends android.support.v4.app.Fragment
             public void onErrorResponse(VolleyError error) {
             }
 
-        })
-        {
+        }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
@@ -165,5 +178,48 @@ public class ResultsFragment extends android.support.v4.app.Fragment
     {
         return getString(R.string.flights_url) + "?origin=" + origin + "&destination=" +
                 destination + "&departuredate=" + departureDate + "&returndate=2017-01-08&limit=1&onlineitinerariesonly=N&offset=1&eticketsonly=N&sortby=departuretime&order=asc&sortby2=elapsedtime&order2=asc&pointofsalecountry=US";
+    }
+
+
+    private void TestSoapCall(){
+        final String SOAP_ACTION = "http://www.travelport.com/schema/air_v31_0/air:SeatMapReq";
+        final String NAMESPACE = "http://www.travelport.com/schema/air_v31_0";
+        final String METHOD_NAME = "air:SeatMapReq";
+        final String URL = "https://americas.universal-api.pp.travelport.com/B2BGateway/connect/uAPI/";
+
+        Thread nT = new Thread() {
+            @Override
+            public void run() {
+
+                SoapObject request = new SoapObject(NAMESPACE,
+                        METHOD_NAME);
+
+                request.addProperty("userID", 1);
+
+
+                SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                        SoapEnvelope.VER11);
+
+                envelope.setOutputSoapObject(request);
+                envelope.dotNet = true;
+                HttpTransportSE androidHttpTransport = new HttpTransportSE(
+                        URL);
+
+                try {
+
+                    androidHttpTransport.debug = true;
+                    androidHttpTransport.call(SOAP_ACTION, envelope);
+
+                    final String results = androidHttpTransport.responseDump.toString();
+                    boolean res = results.equalsIgnoreCase("fail");
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        };
+        nT.start();
     }
 }

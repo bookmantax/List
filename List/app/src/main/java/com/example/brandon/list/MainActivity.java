@@ -13,6 +13,7 @@ import com.android.volley.toolbox.Volley;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -23,6 +24,9 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
     private DatabaseHelper db;
     private static MainActivity sInstance;
     private RequestQueue mRequestQueue;
+    public String airlineOrOrigin, flightNumberOrDestination;
+    public int day, month, year;
+    public boolean isFavoritesSearch, includeMorningResults, includeAfternoonResults, includeNightResults, directFlightsOnly;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,16 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         startUp = true;
         search = false;
         db = new DatabaseHelper(this);
+        isFavoritesSearch = false;
+        includeMorningResults = true;
+        includeAfternoonResults = true;
+        includeNightResults = true;
+        directFlightsOnly = false;
+
+        Calendar cal= Calendar.getInstance();
+        year=cal.get(Calendar.YEAR);
+        month=cal.get(Calendar.MONTH);
+        day=cal.get(Calendar.DAY_OF_MONTH);
 
         bottomBar = (AHBottomNavigation)findViewById(R.id.mainNavBar);
         bottomBar.setOnTabSelectedListener(this);
@@ -57,14 +71,16 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
     private void CreateNavItems()
     {
         AHBottomNavigationItem searchItem = new AHBottomNavigationItem("Search", R.drawable.ic_action_name);
-        AHBottomNavigationItem resultsItem = new AHBottomNavigationItem("Users", R.drawable.ic_action_name);
-        AHBottomNavigationItem bookmarksItem = new AHBottomNavigationItem("CheckIn", R.drawable.ic_action_name);
-        AHBottomNavigationItem hubItem = new AHBottomNavigationItem("Rating", R.drawable.ic_action_name);
+        AHBottomNavigationItem resultsItem = new AHBottomNavigationItem("Results", R.drawable.ic_action_name);
+        AHBottomNavigationItem bookmarksItem = new AHBottomNavigationItem("Bookmarks", R.drawable.ic_action_name);
+        AHBottomNavigationItem hubItem = new AHBottomNavigationItem("Hub", R.drawable.ic_action_name);
+        AHBottomNavigationItem settingsItem = new AHBottomNavigationItem("Settings", R.drawable.ic_action_name);
 
         bottomBar.addItem(searchItem);
         bottomBar.addItem(resultsItem);
         bottomBar.addItem(bookmarksItem);
         bottomBar.addItem(hubItem);
+        bottomBar.addItem(settingsItem);
 
         bottomBar.setDefaultBackgroundColor(Color.parseColor("#FEFEFE"));
         bottomBar.setCurrentItem(0);
@@ -81,18 +97,23 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         }
         else if(position == 1 && !wasSelected)
         {
-            ResultsFragment usersFragment = new ResultsFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainLayout, usersFragment).commit();
+            ResultsFragment resultsFragment = new ResultsFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainLayout, resultsFragment).commit();
         }
         else if(position == 2 && !wasSelected)
         {
-            BookmarksFragment checkInFragment = new BookmarksFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainLayout, checkInFragment).commit();
+            BookmarksFragment bookmarksFragment = new BookmarksFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainLayout, bookmarksFragment).commit();
         }
         else if(position == 3 && !wasSelected)
         {
-            HubFragment ratingFragment = new HubFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainLayout, ratingFragment).commit();
+            HubFragment hubFragment = new HubFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainLayout, hubFragment).commit();
+        }
+        else if(position == 4 && !wasSelected)
+        {
+            SettingsFragment settingsFragment = new SettingsFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainLayout, settingsFragment).commit();
         }
     }
 
@@ -109,26 +130,5 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
     public void SetSearch(boolean bool)
     {
         search = bool;
-    }
-
-    public void CreateBookmark(FlightItem flightItem, List<FlightDetails> flightDetails)
-    {
-        Cursor lastTrip;
-        FlightDetails flightDetail;
-        int lastTripId;
-        String departureDate = flightItem.flightDepartureTime.substring(0, 10);
-        String arrivalDate = flightItem.flightArrivalTime.substring(0, 10);
-        db.InsertTrip(flightDetails.size(), flightItem.flightDeparture, flightItem.flightArrival,
-                flightItem.flightDepartureTime, flightItem.flightArrivalTime, departureDate + " - " + arrivalDate);
-
-        lastTrip = db.GetLastTrip();
-        lastTrip.moveToFirst();
-        lastTripId = Integer.parseInt(lastTrip.getString(lastTrip.getColumnIndex("TRIP_ID")));
-
-        for(int i = 0; i < flightDetails.size(); i++)
-        {
-            flightDetail = flightDetails.get(i);
-            db.InsertFlight(Integer.getInteger(flightDetail.flightDetailsFlightNumber), lastTripId);
-        }
     }
 }

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:text="Add New"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView10"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp" />
+
+    <Button
+        android:text="Save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/addFavoriteSaveFavoriteButton"
+        android:elevation="0dp"
+        android:onClick="SaveFavorite" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView10"
+        android:layout_alignParentStart="true"
+        android:id="@+id/addFavoriteFirstTextView"
+        android:layout_marginBottom="50dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/addFavoriteFirstTextView"
+        android:layout_alignEnd="@+id/addFavoriteFirstTextView"
+        android:id="@+id/addFavoriteSecondTextView" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/addFavoriteFirstEditText"
+        android:layout_alignTop="@+id/addFavoriteFirstTextView"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/addFavoriteFirstTextView" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:layout_alignTop="@+id/addFavoriteSecondTextView"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/addFavoriteSecondEditText"
+        android:layout_toEndOf="@+id/addFavoriteSecondTextView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/addFavoriteSaveFavoriteButton"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/addFavoriteErrorTextView" />
+
+</RelativeLayout>

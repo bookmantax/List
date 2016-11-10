@@ -5,10 +5,12 @@ package com.example.brandon.list;
  */
 
 public class FavoriteItem {
-    private String favoriteDepartureArrival;
+    public String airlineOrOrigin, toOrFlight, flightNumberOrDestination;
 
-    public FavoriteItem(String favoriteDepartureArrival)
+    public FavoriteItem(String airlineOrOrigin, String toOrFlight, String flightNumberOrDestination)
     {
-        this.favoriteDepartureArrival = favoriteDepartureArrival;
+        this.airlineOrOrigin = airlineOrOrigin;
+        this.toOrFlight = toOrFlight;
+        this.flightNumberOrDestination = flightNumberOrDestination;
     }
 }
